@@ -6,9 +6,13 @@ Resources:
     Properties:
       InstanceType: t2.micro
       ImageId: ami-09fe153fd4143fcde # Amazon Linux 2 AMI (HVM), SSD Volume Type
-      KeyName: TestKeyPair07 # Replace with your key pair name
       SecurityGroups:
-        - Ref: MySecurityGroup  
+        - Ref: MySecurityGroup
+      KeyName: 
+        - Ref: MyKeyPair08    
+      tags:
+        - Key: Name
+          Value: Server03  
 
   MySecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
@@ -19,4 +23,13 @@ Resources:
           FromPort: 3389
           ToPort: 3389
           CidrIp: 0.0.0.0/0
+
+  NewKeyPair:
+    Type: 'AWS::EC2::KeyPair'
+    Properties:
+      KeyName: MyKeyPair08
+      KeyType: rsa
+      Tags:
+        - Key: Name
+          Value: MyKeyPair08        
 
