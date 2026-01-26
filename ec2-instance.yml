@@ -9,8 +9,8 @@ Resources:
       SecurityGroups:
         - Ref: MySecurityGroup
       KeyName: 
-        - Ref: NewKeyPair    
-      tags:
+        Ref: NewKeyPair
+      Tags:
         - Key: Name
           Value: Server03  
 
