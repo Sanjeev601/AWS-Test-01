@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: '2010-09-15'
+description: AWS CloudFormation Template to create an EC2 instance
+Resources:
+  MyEC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-09fe153fd4143fcde # Amazon Linux 2 AMI (HVM), SSD Volume Type
+      KeyName: TestKeyPair07 # Replace with your key pair name
+      SecurityGroups:
+        - Ref: MySecurityGroup  
+
+  MySecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Enable SSH access via port 22
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: 0.0.0.0/0
+
