@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       instance_type:
-        description: 'EC2 Instance Type'
+        description: 'Choose an EC2 Instance Type"'
         required: true
         default: 't2.micro'
         type: choice
@@ -41,5 +41,4 @@ jobs:
             --template-file ec2-instance.yml \
             --stack-name GitHubActionsCloudStack01 \
             --capabilities CAPABILITY_NAMED_IAM
-            --parameter-overrides \
-              InstanceType=${{ github.event.inputs.instance_type }}
+            --parameter-overrides InstanceType=${{ github.event.inputs.instance_type }}
