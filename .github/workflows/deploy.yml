@@ -41,4 +41,5 @@ jobs:
             --template-file ec2-instance.yml \
             --stack-name GitHubActionsCloudStack01 \
             --capabilities CAPABILITY_NAMED_IAM
-            --parameter-overrides InstanceType=${{ github.event.inputs.instance_type }}
+            --parameter-overrides \
+              InstanceType=${{ github.event.inputs.instance_type }}
