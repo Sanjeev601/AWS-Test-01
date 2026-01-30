@@ -1,11 +1,23 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: AWS CloudFormation Template to create an EC2 instance
+
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+    Description: EC2 Instance Type
+
 Resources:
   MyEC2Instance:
     Type: 'AWS::EC2::Instance'
     Properties:
-      InstanceType: t2.micro
-      ImageId: ami-09fe153fd4143fcde # Amazon Linux 2 AMI (HVM), SSD Volume Type
+      InstanceType:
+        Ref: InstanceType
+      ImageId: ami-09fe153fd4143fcde # Windows Server 2019 Base in us-east-1
       SecurityGroups:
         - Ref: MySecurityGroup
       KeyName: 
@@ -17,7 +29,7 @@ Resources:
   MySecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
-      GroupDescription: Enable SSH access via port 22
+      GroupDescription: Enable RDP access via port 3389
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 3389
