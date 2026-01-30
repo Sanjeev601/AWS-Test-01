@@ -24,7 +24,7 @@ Resources:
         Ref: NewKeyPair
       Tags:
         - Key: Name
-          Value: Server03  
+          Value: Server05  
 
   MySecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
@@ -39,9 +39,9 @@ Resources:
   NewKeyPair:
     Type: 'AWS::EC2::KeyPair'
     Properties:
-      KeyName: MyKeyPair08
+      KeyName: MyKeyPair07
       KeyType: rsa
       Tags:
         - Key: Name
-          Value: MyKeyPair08        
+          Value: MyKeyPair07        
 
