@@ -2,46 +2,68 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: AWS CloudFormation Template to create an EC2 instance
 
 Parameters:
-  InstanceType:
+  EnvironmentName:  # logical name of the parameter
     Type: String
-    Default: t2.micro
+    Default: Dev
     AllowedValues:
-      - t2.micro
-      - t2.small
-      - t2.medium
-    Description: EC2 Instance Type
+      - Dev
+      - Test
+      - Prod
+
+Mappings:
+  EnvMap: # logical name of the mapping
+    Dev:
+      instanceType: "t2.micro"  # Amazon Windows Server 2019 Base
+      name: "Dev-EC2-Instance"
+    Test:
+      instanceType: "t2.small"
+      name: "Test-EC2-Instance"
+    Prod:
+      instanceType: "t2.medium"
+      name: "Prod-EC2-Instance"
 
 Resources:
-  MyEC2Instance:
-    Type: 'AWS::EC2::Instance'
+  EC2Role:
+    Type: AWS::IAM::Role
     Properties:
-      InstanceType:
-        Ref: InstanceType
-      ImageId: ami-09fe153fd4143fcde # Windows Server 2019 Base in us-east-1
-      SecurityGroups:
-        - Ref: MySecurityGroup
-      KeyName: 
-        Ref: NewKeyPair
-      Tags:
-        - Key: Name
-          Value: Server69  
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
 
-  MySecurityGroup:
-    Type: 'AWS::EC2::SecurityGroup'
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref EC2Role
+
+  TestSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Enable RDP access via port 3389
+      VpcId: vpc-0f0cd80060690caa0
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 3389
           ToPort: 3389
-          CidrIp: 0.0.0.0/0
+          CidrIp: 10.0.0.0/8  # Restrict to private network range 
 
-  NewKeyPair:
-    Type: 'AWS::EC2::KeyPair'
+  EC2Instance:
+    Type: 'AWS::EC2::Instance'
     Properties:
-      KeyName: MyKeyPair25
-      KeyType: rsa
+      ImageId: ami-09fe153fd4143fcde  # Amazon Windows Server 2019 Base
+      InstanceType: !FindInMap [EnvMap, !Ref EnvironmentName, instanceType]
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      SecurityGroupIds: 
+        - !Ref TestSecurityGroup
+      SubnetId: subnet-xxxxxxxxx  # Replace with your subnet ID
+      EbsOptimized: true
+      Monitoring: true
       Tags:
         - Key: Name
-          Value: MyKeyPair25        
-
+          Value: !FindInMap [EnvMap, !Ref EnvironmentName, name]

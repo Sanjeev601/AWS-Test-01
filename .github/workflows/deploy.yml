@@ -3,15 +3,15 @@ name: Deploy CloudFormation EC2
 on:
   workflow_dispatch:
     inputs:
-      instance_type:
-        description: 'Choose an EC2 Instance Type'
+      instance_environment:
+        description: 'Choose the EC2 Environment'
         required: true
-        default: 't2.micro'
+        default: 'Dev'
         type: choice
         options:
-          - t2.micro
-          - t2.small
-          - t2.medium
+          - Dev
+          - Test
+          - Prod
 
 permissions:
   id-token: write
@@ -41,4 +41,4 @@ jobs:
             --template-file ec2-instance.yml \
             --stack-name GitHubActionsCloudStack01 \
             --capabilities CAPABILITY_NAMED_IAM \
-            --parameter-overrides InstanceType=${{ github.event.inputs.instance_type }}
+            --parameter-overrides instance_environment=${{ github.event.inputs.instance_environment }}
