@@ -36,7 +36,7 @@ Resources:
         CidrIp: 0.0.0.0/0
       Tags:
       - Key: Name
-        Value: Test-Security-Group
+        Value: Test-Security-Group01
 
   EC2Instance:
     Type: 'AWS::EC2::Instance'
@@ -53,11 +53,11 @@ Resources:
   NewKeyPair:
     Type: AWS::EC2::KeyPair
     Properties:
-      KeyName: MyKeyPair # Replace with your desired key pair name  
+      KeyName: MyKeyPair02 # Replace with your desired key pair name  
       KeyType: rsa
       Tags:
       - Key: Name
-        Value: MyKeyPair
+        Value: MyKeyPair02
 
 Outputs:
   InstanceId:
