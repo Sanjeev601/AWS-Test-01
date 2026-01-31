@@ -44,11 +44,22 @@ Resources:
       ImageId: ami-09fe153fd4143fcde # Amazon Windows Server 2019 Base
       InstanceType: !FindInMap [ EnvMap, !Ref EnvironmentName, instanceType ]
       SubnetId: subnet-0123456789abcdef0 # Replace with your actual subnet ID
+      KeyName: !Ref NewKeyPair
       SecurityGroupIds:
       - !GetAtt TestSecurityGroup.GroupId
       Tags:
       - Key: Name
         Value: !FindInMap [ EnvMap, !Ref EnvironmentName, name ]
+
+  NewKeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: MyKeyPair # Replace with your desired key pair name  
+      KeyType: rsa
+      Tags:
+      - Key: Name
+        Value: MyKeyPair
+
 Outputs:
   InstanceId:
     Description: "InstanceId of the newly created EC2 instance"
