@@ -3,7 +3,7 @@ name: Deploy CloudFormation EC2
 on:
   workflow_dispatch:
     inputs:
-      instance_environment:
+      EnvironmentName:
         description: 'Choose the EC2 Environment'
         required: true
         default: 'Dev'
@@ -41,4 +41,4 @@ jobs:
             --template-file ec2-instance.yml \
             --stack-name GitHubActionsCloudStack01 \
             --capabilities CAPABILITY_NAMED_IAM \
-            --parameter-overrides instance_environment=${{ github.event.inputs.instance_environment }}
+            --parameter-overrides EnvironmentName=${{ github.event.inputs.EnvironmentName }}
