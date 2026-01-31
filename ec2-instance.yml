@@ -29,7 +29,6 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Enable RDP access via port 3389
-      VpcId: vpc-0f0cd80060690caa0
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 3389
@@ -37,15 +36,16 @@ Resources:
         CidrIp: 0.0.0.0/0
       Tags:
       - Key: Name
-        Value: SecutityGroup07
+        Value: Test-Security-Group
 
   EC2Instance:
     Type: 'AWS::EC2::Instance'
     Properties:
       ImageId: ami-09fe153fd4143fcde # Amazon Windows Server 2019 Base
       InstanceType: !FindInMap [ EnvMap, !Ref EnvironmentName, instanceType ]
-      SecurityGroups:
-      - Ref: TestSecurityGroup
+      SubnetId: subnet-0123456789abcdef0 # Replace with your actual subnet ID
+      SecurityGroupIds:
+      - !GetAtt TestSecurityGroup.GroupId
       Tags:
       - Key: Name
         Value: !FindInMap [ EnvMap, !Ref EnvironmentName, name ]
