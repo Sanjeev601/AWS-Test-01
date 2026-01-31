@@ -2,46 +2,53 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: AWS CloudFormation Template to create an EC2 instance
 
 Parameters:
-  InstanceType:
+  EnvironmentName:
+    # logical name of the parameter
     Type: String
-    Default: t2.micro
+    Default: Dev
     AllowedValues:
-      - t2.micro
-      - t2.small
-      - t2.medium
-    Description: EC2 Instance Type
+    - Dev
+    - Test
+    - Prod
+
+Mappings:
+  EnvMap:
+    # logical name of the mapping
+    Dev:
+      instanceType: "t2.micro" # Amazon Windows Server 2019 Base
+      name: "Dev-EC2-Instance"
+    Test:
+      instanceType: "t2.small"
+      name: "Test-EC2-Instance"
+    Prod:
+      instanceType: "t2.medium"
+      name: "Prod-EC2-Instance"
 
 Resources:
-  MyEC2Instance:
-    Type: 'AWS::EC2::Instance'
-    Properties:
-      InstanceType:
-        Ref: InstanceType
-      ImageId: ami-09fe153fd4143fcde # Windows Server 2019 Base in us-east-1
-      SecurityGroups:
-        - Ref: MySecurityGroup
-      KeyName: 
-        Ref: NewKeyPair
-      Tags:
-        - Key: Name
-          Value: Server69  
-
-  MySecurityGroup:
-    Type: 'AWS::EC2::SecurityGroup'
+  TestSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Enable RDP access via port 3389
+      VpcId: vpc-0f0cd80060690caa0
       SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 3389
-          ToPort: 3389
-          CidrIp: 0.0.0.0/0
-
-  NewKeyPair:
-    Type: 'AWS::EC2::KeyPair'
-    Properties:
-      KeyName: MyKeyPair25
-      KeyType: rsa
+      - IpProtocol: tcp
+        FromPort: 3389
+        ToPort: 3389
+        CidrIp: 0.0.0.0/0
       Tags:
-        - Key: Name
-          Value: MyKeyPair25        
+      - Key: Name
+        Value: SecutityGroup07
 
+  EC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: ami-09fe153fd4143fcde # Amazon Windows Server 2019 Base
+      InstanceType: !FindInMap [ EnvMap, !Ref EnvironmentName, instanceType ]
+      SecurityGroups: !Ref TestSecurityGroup
+      Tags:
+      - Key: Name
+        Value: !FindInMap [ EnvMap, !Ref EnvironmentName, name ]
+Outputs:
+  InstanceId:
+    Description: "InstanceId of the newly created EC2 instance"
+    Value: !Ref EC2Instance
