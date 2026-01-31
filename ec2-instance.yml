@@ -2,18 +2,20 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: AWS CloudFormation Template to create an EC2 instance
 
 Parameters:
-  EnvironmentName:  # logical name of the parameter
+  EnvironmentName:
+    # logical name of the parameter
     Type: String
     Default: Dev
     AllowedValues:
-      - Dev
-      - Test
-      - Prod
+    - Dev
+    - Test
+    - Prod
 
 Mappings:
-  EnvMap: # logical name of the mapping
+  EnvMap:
+    # logical name of the mapping
     Dev:
-      instanceType: "t2.micro"  # Amazon Windows Server 2019 Base
+      instanceType: "t2.micro" # Amazon Windows Server 2019 Base
       name: "Dev-EC2-Instance"
     Test:
       instanceType: "t2.small"
@@ -23,47 +25,31 @@ Mappings:
       name: "Prod-EC2-Instance"
 
 Resources:
-  EC2Role:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: ec2.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-
-  EC2InstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      Roles:
-        - !Ref EC2Role
-
   TestSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Enable RDP access via port 3389
       VpcId: vpc-0f0cd80060690caa0
       SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 3389
-          ToPort: 3389
-          CidrIp: 10.0.0.0/8  # Restrict to private network range 
+      - IpProtocol: tcp
+        FromPort: 3389
+        ToPort: 3389
+        CidrIp: 0.0.0.0/0
+      Tags:
+      - Key: Name
+        Value: SecutityGroup07
 
   EC2Instance:
     Type: 'AWS::EC2::Instance'
     Properties:
-      ImageId: ami-09fe153fd4143fcde  # Amazon Windows Server 2019 Base
-      InstanceType: !FindInMap [EnvMap, !Ref EnvironmentName, instanceType]
-      IamInstanceProfile: !Ref EC2InstanceProfile
-      SecurityGroupIds: 
-        - !Ref TestSecurityGroup
-      SubnetId: subnet-xxxxxxxxx  # Replace with your subnet ID
-      EbsOptimized: true
-      Monitoring: true
+      ImageId: ami-09fe153fd4143fcde # Amazon Windows Server 2019 Base
+      InstanceType: !FindInMap [ EnvMap, !Ref EnvironmentName, instanceType ]
+      SecurityGroupIds:
+      - !Ref TestSecurityGroup
       Tags:
-        - Key: Name
-          Value: !FindInMap [EnvMap, !Ref EnvironmentName, name]
+      - Key: Name
+        Value: !FindInMap [ EnvMap, !Ref EnvironmentName, name ]
+Outputs:
+  InstanceId:
+    Description: "InstanceId of the newly created EC2 instance"
+    Value: !Ref EC2Instance
