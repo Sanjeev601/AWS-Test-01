@@ -43,7 +43,6 @@ Resources:
     Properties:
       ImageId: ami-09fe153fd4143fcde # Amazon Windows Server 2019 Base
       InstanceType: !FindInMap [ EnvMap, !Ref EnvironmentName, instanceType ]
-      SubnetId: subnet-0123456789abcdef0 # Replace with your actual subnet ID
       KeyName: !Ref NewKeyPair
       SecurityGroupIds:
       - !GetAtt TestSecurityGroup.GroupId
