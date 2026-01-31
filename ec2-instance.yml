@@ -44,7 +44,8 @@ Resources:
     Properties:
       ImageId: ami-09fe153fd4143fcde # Amazon Windows Server 2019 Base
       InstanceType: !FindInMap [ EnvMap, !Ref EnvironmentName, instanceType ]
-      SecurityGroups: !Ref TestSecurityGroup
+      SecurityGroupIds:
+        : !Ref TestSecurityGroup
       Tags:
       - Key: Name
         Value: !FindInMap [ EnvMap, !Ref EnvironmentName, name ]
