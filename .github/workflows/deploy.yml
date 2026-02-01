@@ -38,6 +38,6 @@ jobs:
         run: |
           aws cloudformation deploy \
             --template-file ec2-instance.yml \
-            --stack-name GitHubActionsCloudStack09 \
+            --stack-name GitHubActionsCloudStack10 \
             --capabilities CAPABILITY_NAMED_IAM \
             --parameter-overrides EnvironmentName=${{ github.event.inputs.EnvironmentName }}
