@@ -20,7 +20,7 @@ Resources:
       InstanceType: !If
         - TestConditonName
         - t2.micro
-        - t3.micro
+        - t2.medium
       ImageId: "ami-09fe153fd4143fcde" # Windows Server 2019 Base - us-east-1
       Tags:
       - Key: "Name"
