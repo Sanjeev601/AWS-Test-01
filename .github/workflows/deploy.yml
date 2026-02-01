@@ -11,7 +11,6 @@ on:
         options:
           - Dev
           - Test
-          - Prod
 
 permissions:
   id-token: write
