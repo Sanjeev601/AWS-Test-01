@@ -1,11 +1,11 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: AWS CloudFormation Template to create an EC2 instance
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "AWS CloudFormation Template to create an EC2 instance"
 
 Parameters:
   EnvironmentName:
-    # logical name of the parameter
+    Description: "Enter Environment Name"
     Type: String
-    Default: Dev
+    Default: "Dev"
     AllowedValues:
     - Dev
     - Test
@@ -13,53 +13,48 @@ Parameters:
 
 Mappings:
   EnvMap:
-    # logical name of the mapping
     Dev:
-      instanceType: "t2.micro" # Amazon Windows Server 2019 Base
-      name: "Dev-EC2-Instance"
+      instanceType: t2.micro
+      Name: "Dev-Instance"
     Test:
-      instanceType: "t2.small"
-      name: "Test-EC2-Instance"
+      instanceType: t2.small
+      Name: "Test-Instance"
     Prod:
-      instanceType: "t2.medium"
-      name: "Prod-EC2-Instance"
+      instanceType: t2.medium
+      Name: "Prod-Instance"
+
+Conditions:
+  CreateProdResources: !Equals [ !Ref EnvironmentName, "Prod" ]
 
 Resources:
-  TestSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Enable RDP access via port 3389
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 3389
-        ToPort: 3389
-        CidrIp: 0.0.0.0/0
-      Tags:
-      - Key: Name
-        Value: Test-Security-Group05
-
   EC2Instance:
-    Type: 'AWS::EC2::Instance'
+    Type: "AWS::EC2::Instance"
     Properties:
-      ImageId: ami-09fe153fd4143fcde # Amazon Windows Server 2019 Base
       InstanceType: !FindInMap [ EnvMap, !Ref EnvironmentName, instanceType ]
-      KeyName: !Ref NewKeyPair
-      SecurityGroupIds:
-      - !GetAtt TestSecurityGroup.GroupId
+      ImageId: "ami-09fe153fd4143fcde" # Windows Server 2019 Base in us-east-1
       Tags:
-      - Key: Name
-        Value: !FindInMap [ EnvMap, !Ref EnvironmentName, name ]
+      - Key: "Name"
+        Value: !FindInMap [ EnvMap, !Ref EnvironmentName, Name ]
 
-  NewKeyPair:
-    Type: AWS::EC2::KeyPair
+  NewVolume:
+    Type: "AWS::EC2::Volume"
+    Condition: CreateProdResources
     Properties:
-      KeyName: MyKeyPair05 # Replace with your desired key pair name  
-      KeyType: rsa
+      Size: 20
+      AvailabilityZone: !GetAtt EC2Instance.AvailabilityZone
       Tags:
-      - Key: Name
-        Value: MyKeyPair05
+      - Key: "Name"
+        Value: "Prod-Volume"
+
+  MountPoint:
+    Type: "AWS::EC2::VolumeAttachment"
+    Condition: CreateProdResources
+    Properties:
+      Device: "/dev/sdh"
+      InstanceId: !Ref EC2Instance
+      VolumeId: !Ref NewVolume
 
 Outputs:
   InstanceId:
-    Description: "InstanceId of the newly created EC2 instance"
+    Description: "EC2 Instance ID"
     Value: !Ref EC2Instance
