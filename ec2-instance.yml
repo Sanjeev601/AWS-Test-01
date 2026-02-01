@@ -1,60 +1,27 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "AWS CloudFormation Template to create an EC2 instance"
+Description: "AWS CloudFormation Template to create an EC2 instance"!And
 
 Parameters:
-  EnvironmentName:
-    Description: "Enter Environment Name"
+  TestParameter:
+    Description: "Enter the Envoironment Name"
     Type: String
     Default: "Dev"
     AllowedValues:
-    - Dev
-    - Test
-    - Prod
-
-Mappings:
-  EnvMap:
-    Dev:
-      instanceType: t2.micro
-      Name: "Dev-Instance"
-    Test:
-      instanceType: t2.small
-      Name: "Test-Instance"
-    Prod:
-      instanceType: t2.medium
-      Name: "Prod-Instance"
-
+      - Dev
+      - Test
+    
 Conditions:
-  CreateProdResources: !Equals [ !Ref EnvironmentName, "Prod" ]
+  TestConditonName: !Equals [ !Ref TestParameter, "Dev" ]
 
 Resources:
   EC2Instance:
     Type: "AWS::EC2::Instance"
     Properties:
-      InstanceType: !FindInMap [ EnvMap, !Ref EnvironmentName, instanceType ]
-      ImageId: "ami-09fe153fd4143fcde" # Windows Server 2019 Base in us-east-1
+      InstanceType: !If 
+        - TestConditonName
+        - t2.micro
+        - t3.micro
+      ImageId: "ami-09fe153fd4143fcde" # Windows Server 2019 Base - us-east-1
       Tags:
-      - Key: "Name"
-        Value: !FindInMap [ EnvMap, !Ref EnvironmentName, Name ]
-
-  NewVolume:
-    Type: "AWS::EC2::Volume"
-    Condition: CreateProdResources
-    Properties:
-      Size: 20
-      AvailabilityZone: !GetAtt EC2Instance.AvailabilityZone
-      Tags:
-      - Key: "Name"
-        Value: "Prod-Volume"
-
-  MountPoint:
-    Type: "AWS::EC2::VolumeAttachment"
-    Condition: CreateProdResources
-    Properties:
-      Device: "/dev/sdh"
-      InstanceId: !Ref EC2Instance
-      VolumeId: !Ref NewVolume
-
-Outputs:
-  InstanceId:
-    Description: "EC2 Instance ID"
-    Value: !Ref EC2Instance
+        - Key: "Name"
+          Value: !Sub "EC2Instance-${TestParameter}"
