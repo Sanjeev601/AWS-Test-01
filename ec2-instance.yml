@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "AWS CloudFormation Template to create an EC2 instance"!And
+Description: "AWS CloudFormation Template to create an EC2 instance"
 
 Parameters:
   TestParameter:
@@ -7,9 +7,9 @@ Parameters:
     Type: String
     Default: "Dev"
     AllowedValues:
-      - Dev
-      - Test
-    
+    - Dev
+    - Test
+
 Conditions:
   TestConditonName: !Equals [ !Ref TestParameter, "Dev" ]
 
@@ -17,11 +17,11 @@ Resources:
   EC2Instance:
     Type: "AWS::EC2::Instance"
     Properties:
-      InstanceType: !If 
+      InstanceType: !If
         - TestConditonName
         - t2.micro
         - t3.micro
       ImageId: "ami-09fe153fd4143fcde" # Windows Server 2019 Base - us-east-1
       Tags:
-        - Key: "Name"
-          Value: !Sub "EC2Instance-${TestParameter}"
+      - Key: "Name"
+        Value: !Sub "EC2Instance-${TestParameter}"
