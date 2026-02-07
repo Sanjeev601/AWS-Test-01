@@ -1,19 +1,42 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Give user : Priyanka Permission to create an EC2 Instance"
+Description: "Give user Priyanka permission to create an EC2 Instance"
 
 Resources:
-  TestPolicy05:
+  AWSGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: AWSGroup01
+
+  TestPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: "AllowEC2Creation"
+      PolicyName: TestPolicy09
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
-        - Effect: "Allow"
+        - Effect: Allow
           Action:
-          - "ec2:RunInstances"
-          - "ec2:DescribeInstances"
-          - "ec2:TerminateInstances"
+          - ec2:RunInstances
+          - ec2:DescribeInstances
+          - ec2:TerminateInstances
+          - ec2:StopInstances
+          - ec2:StartInstances
+          - ec2:RebootInstances
+          - ec2:DescribeInstanceStatus
+          - ec2:DescribeKeyPairs
+          - ec2:DescribeSecurityGroups
+          - ec2:DescribeSubnets
+          - ec2:DescribeVpcs
+          - ec2:DescribeImages
+          - ec2:DescribeInstanceTypes
+          - ec2:DescribeTags
           Resource: "*"
+      Groups:
+      - Ref: AWSGroup
+
+  GroupMembership:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref AWSGroup
       Users:
-      - "Priyanka"
+      - Priyanka
