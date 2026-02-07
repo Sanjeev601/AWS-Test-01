@@ -34,6 +34,7 @@ Resources:
           - ec2:AuthorizeSecurityGroupIngress
           - ec2:AuthorizeSecurityGroupEgress
           - ec2:CreateKeyPair
+          - ec2:CreateTags
           Resource: "*"
       Groups:
       - Ref: AWSGroup
