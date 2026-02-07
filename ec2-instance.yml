@@ -1,17 +1,22 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Sexy Lady on the Floor"
+Description: "Create an AWS IAM Group / Role and assign  Permissions"
 
 Resources:
-  TestGroup07:
+  TestAWSGroup:
     Type: AWS::IAM::Group
     Properties:
-      GroupName: TestGroup07
+      GroupName: TestAWSGroup56
+
+  TestAWSRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: TestAWSRole56
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Principal:
+            AWS: !GetAtt TestAWSGroup.Arn
+          Action: sts:AssumeRole
       ManagedPolicyArns:
       - arn:aws:iam::aws:policy/AmazonEC2FullAccess
-
-  AddUserToGroup:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref TestGroup07
-      Users:
-      - Julia
