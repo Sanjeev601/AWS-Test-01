@@ -5,7 +5,7 @@ Resources:
   AWSGroup:
     Type: AWS::IAM::Group
     Properties:
-      GroupName: AWSGroup05
+      GroupName: AWSGroup06
 
   TestPolicy:
     Type: AWS::IAM::Policy
