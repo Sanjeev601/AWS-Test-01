@@ -13,4 +13,4 @@ Resources:
           Action: "ec2:DescribeInstances"
           Resource: "*"
       Users:
-      - "Sheweta"
+      - "Shweta"
