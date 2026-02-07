@@ -1,27 +1,12 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "AWS CloudFormation Template to create an EC2 instance"
-
-Parameters:
-  TestParameter:
-    Description: "Enter the Envoironment Name"
-    Type: String
-    Default: "Dev"
-    AllowedValues:
-    - Dev
-    - Test
-
-Conditions:
-  TestConditonName: !Equals [ !Ref TestParameter, "Dev" ]
+Description: "Create an AWS IAM User"
 
 Resources:
-  EC2Instance:
-    Type: "AWS::EC2::Instance"
+  TestUser:
+    Type: "AWS::IAM::User"
     Properties:
-      InstanceType: !If
-        - TestConditonName
-        - t2.micro
-        - t2.medium
-      ImageId: "ami-09fe153fd4143fcde" # Windows Server 2019 Base - us-east-1
+      UserName: "Aishwarya"
+
       Tags:
-      - Key: "Name"
-        Value: !Sub "EC2Instance-${TestParameter}"
+      - Key: "User Name"
+        Value: "Aishwarya"
