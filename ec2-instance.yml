@@ -5,8 +5,12 @@ Resources:
   TestUser:
     Type: "AWS::IAM::User"
     Properties:
-      UserName: "Aishwarya"
+      UserName: "Shweta"
 
       Tags:
       - Key: "User Name"
-        Value: "Aishwarya"
+        Value: "Shweta"
+
+      LoginProfile:
+        Password: "Apple@123$ecure"
+        PasswordResetRequired: false
