@@ -29,5 +29,5 @@ jobs:
         run: |
           aws cloudformation deploy \
             --template-file ec2-instance.yml \
-            --stack-name GitHubActionsCloudStack10 \
+            --stack-name GitHubActionsCloudStack-${{ github.run_id }} \
             --capabilities CAPABILITY_NAMED_IAM
