@@ -1,16 +1,16 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Granting permission to Shweta to list AWS IAM Users"
+Description: "Give Sheweta Permissio to see the EC2 instances"
 
 Resources:
-  TestIAMPolicy:
-    Type: "AWS::IAM::Policy"
+  TestPolicy02:
+    Type: AWS::IAM::Policy
     Properties:
-      PolicyName: "TestIAMPolicy"
+      PolicyName: "TestPolicy02"
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
         - Effect: "Allow"
-          Action: "iam:ListUsers"
+          Action: "ec2:DescribeInstances"
           Resource: "*"
       Users:
-      - "Shweta"
+      - "Sheweta"
