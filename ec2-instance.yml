@@ -5,12 +5,15 @@ Resources:
   TestPolicy03:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: "TestPolicy03"
+      PolicyName: "TestPolicy05"
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
         - Effect: "Allow"
-          Action: "ec2:Describe*"
+          Action:
+          - "ec2:Describe*"
+          - "ec2:Get*"
           Resource: "*"
+
       Users:
       - "Shweta"
