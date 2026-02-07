@@ -2,10 +2,10 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: "Give Sheweta Permissio to see the EC2 instances"
 
 Resources:
-  TestPolicy02:
+  TestPolicy03:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: "TestPolicy02"
+      PolicyName: "TestPolicy03"
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
