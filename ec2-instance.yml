@@ -1,18 +1,19 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Give Sheweta Permissio to see the EC2 instances"
+Description: "Give user : Priyanka Permission to create an EC2 Instance"
 
 Resources:
-  TestPolicy03:
+  TestPolicy05:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: "TestPolicy05"
+      PolicyName: "AllowEC2Creation"
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
         - Effect: "Allow"
           Action:
-          - "ec2:Describe*"
+          - "ec2:RunInstances"
+          - "ec2:DescribeInstances"
+          - "ec2:TerminateInstances"
           Resource: "*"
-
       Users:
       - "Priyanka"
