@@ -1,16 +1,16 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Create an AWS IAM User"
+Description: "Granting permission to Shweta to list AWS IAM Users"
 
 Resources:
-  TestUser:
-    Type: "AWS::IAM::User"
+  TestIAMPolicy:
+    Type: "AWS::IAM::Policy"
     Properties:
-      UserName: "Shweta"
-
-      Tags:
-      - Key: "User Name"
-        Value: "Shweta"
-
-      LoginProfile:
-        Password: "Apple@123$ecure"
-        PasswordResetRequired: false
+      PolicyName: "TestIAMPolicy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: "Allow"
+          Action: "iam:ListUsers"
+          Resource: "*"
+      Users:
+      - "Shweta"
