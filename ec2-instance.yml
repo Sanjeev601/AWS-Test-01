@@ -1,45 +1,30 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "AWS CloudFormation Template to create anAW IAM Role allowing to create an EC2 Instance"
+Description: "AWS CloudFormation Template to create an EC2 instance"
 
 Resources:
-  EC2InstanceRole:
-    Type: "AWS::IAM::Role"
+  ProdServer05:
+    Type: "AWS::EC2::Instance"
     Properties:
-      RoleName: "EC2InstanceRole01"
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-        - Effect: "Allow"
-          Principal:
-            Service: "ec2.amazonaws.com"
-          Action: "sts:AssumeRole"
-      Policies:
-      - PolicyName: "EC2InstancePolicy"
-        PolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-          - Effect: "Allow"
-            Action:
-            - "ec2:RunInstances"
-            - "ec2:DescribeInstances"
-            - "ec2:TerminateInstances"
-            - "ec2:CreateTags"
-            - "ec2:DescribeImages"
-            - "ec2:DescribeKeyPairs"
-            - "ec2:DescribeSecurityGroups"
-            - "ec2:DescribeSubnets"
-            - "ec2:DescribeVpcs"
-            - "ec2:CreateSecurityGroup"
-            - "ec2:AuthorizeSecurityGroupIngress"
-            - "ec2:RevokeSecurityGroupIngress"
-            - "ec2:DeleteSecurityGroup"
-            - "ec2:AuthorizeSecurityGroupEgress"
-            - "ec2:RevokeSecurityGroupEgress"
-            - "ec2:DeleteSecurityGroup"
-            - "ec2:CreateVolume"
-            - "ec2:AttachVolume"
-            - "ec2:DetachVolume"
-            - "ec2:DeleteVolume"
-            - "ec2:DescribeVolumes"
+      ImageId: "ami-09fe153fd4143fcde"
+      InstanceType: "t2.micro"
+      KeyName: "EC2KeyPair07"
+      Tags:
+      - Key: "Name"
+        Value: "Prod-Server05"
 
-            Resource: "*"
+  TestEBSVolume:
+    Type: "AWS::EC2::Volume"
+    Properties:
+      AvailabilityZone: "us-east-1a"
+      Size: 8
+      VolumeType: "gp2"
+      Tags:
+      - Key: "Name"
+        Value: "TestEBSVolume"
+
+  AttachEBSVolume:
+    Type: "AWS::EC2::VolumeAttachment"
+    Properties:
+      Device: "/dev/sdf"
+      InstanceId: !Ref ProdServer05
+      VolumeId: !Ref TestEBSVolume
