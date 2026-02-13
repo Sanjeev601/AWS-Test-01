@@ -7,7 +7,7 @@ Resources:
     Properties:
       ImageId: "ami-09fe153fd4143fcde"
       InstanceType: "t2.micro"
-      KeyName: "EC2KeyPair07"
+      KeyName: "TestKeyPair99"
       Tags:
       - Key: "Name"
         Value: "Prod-Server05"
@@ -28,8 +28,3 @@ Resources:
       Device: "/dev/sdf"
       InstanceId: !Ref ProdServer05
       VolumeId: !Ref TestEBSVolume
-
-  TestKeyPair:
-    Type: "AWS::EC2::KeyPair"
-    Properties:
-      KeyName: "EC2KeyPair07"
