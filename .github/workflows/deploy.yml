@@ -1,5 +1,4 @@
-name: Deploy CloudFormation EC2
-
+name: Creating an AWS IAM Role that will allow to create an EC2 Instance using GitHub Actions and AWS CloudFormation
 on:
   workflow_dispatch:
 
