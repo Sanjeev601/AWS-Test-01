@@ -28,3 +28,8 @@ Resources:
       Device: "/dev/sdf"
       InstanceId: !Ref ProdServer05
       VolumeId: !Ref TestEBSVolume
+
+  TestKeyPair:
+    Type: "AWS::EC2::KeyPair"
+    Properties:
+      KeyName: "EC2KeyPair07"
