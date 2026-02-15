@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "AWS CloudFormation Template to create an EC2 Launch Template"
+
+Resources:
+  MyLaunchTemplate:
+    Type: "AWS::EC2::LaunchTemplate"
+    Properties:
+      LaunchTemplateName: "MyLaunchTemplate"
+      LaunchTemplateData:
+        ImageId: "ami-09fe153fd4143fcde"
+        InstanceType: "t2.micro"
+        KeyName: "TestKeyPair08"
+        TagSpecifications:
+        - ResourceType: "instance"
+          Tags:
+          - Key: "Name"
+            Value: "MyLaunchTemplate"
+
+  ProdSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Security group for ProdServer05"
+      VpcId: "vpc-0f0cd80060690caa0"
+      SecurityGroupIngress:
+      - IpProtocol: "tcp"
+        FromPort: 3389
+        ToPort: 3389
+        CidrIp: "0.0.0.0/0"
+        CidrIpv6:
+
+
+Outputs:
+  LaunchTemplateId:
+    Description: "ID of the EC2 Launch Template"
+    Value: !Ref MyLaunchTemplate
+
+  LaunchTemplateVersion:
+    Description: "Version of the EC2 Launch Template"
+    Value: !GetAtt MyLaunchTemplate.LatestVersionNumber
