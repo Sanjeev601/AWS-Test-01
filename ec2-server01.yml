@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "Create an EC2 Instance"
+
+Resources:
+  EC2Instance01:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-08a907777e5410897 # Windows Server 2019 Base
+      InstanceType: t2.micro
+      KeyName: TestKeyPair08
+
+      Tags:
+      - Key: Name
+        Value: EC2Instance01
+
+      SecurityGroups:
+      - Ref: SecurityGroup01
+
+  SecurityGroup01:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Allow RDP access to EC2 Instance"
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 3389
+        ToPort: 3389
+        CidrIp: 0.0.0.0/0 # Allow RDP access from anywhere (not recommended for production)
+      Tags:
+      - Key: Name
+        Value: SecurityGroup01
