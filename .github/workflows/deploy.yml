@@ -27,6 +27,6 @@ jobs:
       - name: Deploy CloudFormation stack
         run: |
           aws cloudformation deploy \
-            --template-file main.yml \
+            --template-file ec2-server01.yml \
             --stack-name GitHubActionsCloudStack-${{ github.run_id }} \
             --capabilities CAPABILITY_NAMED_IAM
