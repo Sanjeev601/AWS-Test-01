@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Root stack to create EC2 Launch Template and EC2 Instance"
+
+Resources:
+  LaunchTemplateStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://srijitadutta.s3.us-east-1.amazonaws.com/LaunchTemplate01.yml
+
+  EC2InstanceStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://srijitadutta.s3.us-east-1.amazonaws.com/ec2-server01.yml
+      Parameters:
+        LaunchTemplateId: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateId
+        LaunchTemplateVersion: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateLatestVersion
