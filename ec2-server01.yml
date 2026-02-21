@@ -1,30 +1,21 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: "Create an EC2 Instance"
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Create an EC2 Instance using a Launch Template"
+
+Parameters:
+  LaunchTemplateId:
+    Type: String
+  LaunchTemplateVersion:
+    Type: String
 
 Resources:
   EC2Instance01:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-08a907777e5410897 # Windows Server 2019 Base
-      InstanceType: t2.micro
-      KeyName: TestKeyPair08
+      LaunchTemplate:
+        LaunchTemplateId: !Ref LaunchTemplateId
+        Version: !Ref LaunchTemplateVersion
 
-      Tags:
-      - Key: Name
-        Value: EC2Instance01
-
-      SecurityGroups:
-      - Ref: SecurityGroup01
-
-  SecurityGroup01:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: "Allow RDP access to EC2 Instance"
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 3389
-        ToPort: 3389
-        CidrIp: 0.0.0.0/0 # Allow RDP access from anywhere (not recommended for production)
-      Tags:
-      - Key: Name
-        Value: SecurityGroup01
+Outputs:
+  InstanceId:
+    Description: "ID of the EC2 Instance"
+    Value: !Ref EC2Instance01
