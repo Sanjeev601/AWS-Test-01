@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Create a VPC, Subnet, Internet Gateway and attach the Internet Gateway to the VPC and create a route table and edit routes to allow internet access"
+
+Resources:
+  VPC01:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      Tags:
+      - Key: Name
+        Value: VPC01
+
+  Subnet01:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC01
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: us-east-1a
+      Tags:
+      - Key: Name
+        Value: Subnet01
+
+  InternetGateway01:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: Name
+        Value: InternetGateway01
+
+  VPCGatewayAttachment01:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway01
+      VpcId: !Ref VPC01
+
+  RouteTable01:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC01
+      Tags:
+      - Key: Name
+        Value: RouteTable01
+
+  Route01:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable01
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway01
+
+  SubnetRouteTableAssociation01:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet01
+      RouteTableId: !Ref RouteTable01
+
+  EC2Instance01:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-08a907777e5410897 # Windows Server 2019 Base
+      InstanceType: t2.micro
+      KeyName: TestKeyPair08
+      SubnetId: !Ref Subnet01
+      Tags:
+      - Key: Name
+        Value: EC2Instance01
+
+  SecurityGroup01:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Allow RDP access to EC2 Instance"
+      VpcId: !Ref VPC01
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 3389
+        ToPort: 3389
+        CidrIp: 0.0.0.0/0
