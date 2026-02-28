@@ -60,7 +60,6 @@ Resources:
       ImageId: ami-08a907777e5410897 # Windows Server 2019 Base
       InstanceType: t2.micro
       KeyName: TestKeyPair08
-      SubnetId:
       NetworkInterfaces:
       - AssociatePublicIpAddress: true
         DeviceIndex: 0
