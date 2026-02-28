@@ -61,6 +61,7 @@ Resources:
       InstanceType: t2.micro
       KeyName: TestKeyPair08
       SubnetId: !Ref Subnet01
+      PublicIPAddress: true
       Tags:
       - Key: Name
         Value: EC2Instance01
