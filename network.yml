@@ -60,8 +60,15 @@ Resources:
       ImageId: ami-08a907777e5410897 # Windows Server 2019 Base
       InstanceType: t2.micro
       KeyName: TestKeyPair08
-      SubnetId: !Ref Subnet01
-      PublicIPAddress: true
+      SubnetId:
+      NetworkInterfaces:
+      - AssociatePublicIpAddress: true
+        DeviceIndex: 0
+        SubnetId: !Ref Subnet01
+        GroupSet:
+        - Fn::GetAtt:
+          - SecurityGroup01
+          - GroupId
       Tags:
       - Key: Name
         Value: EC2Instance01
