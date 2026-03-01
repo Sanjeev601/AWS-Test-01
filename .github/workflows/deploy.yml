@@ -1,4 +1,4 @@
-name: Creating an AWS IAM Role that will allow to create an EC2 Instance using GitHub Actions and AWS CloudFormation
+name: Building AWS Cloud Infra
 on:
   workflow_dispatch:
 
