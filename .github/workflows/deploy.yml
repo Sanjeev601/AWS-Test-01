@@ -1,4 +1,4 @@
-name: Building AWS Cloud Infra
+name: Building a Domain Controller
 on:
   workflow_dispatch:
 
