@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Create an EC2 Instance with IAM Role for SSM access"
+
+Resources:
+  IAMRole01:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: EC2SSMAccessRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: ec2.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+  EC2InstanceSSMProfile01:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: EC2SSMAccessInstanceProfile
+      Roles:
+      - !Ref IAMRole01
+
+  EC2Instance01:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-08a907777e5410897 # Windows Server 2019 Base
+      InstanceType: t2.micro
+      IamInstanceProfile: !Ref IAMRole01
+      Tags:
+      - Key: Name
+        Value: EC2InstanceWithSSMAccess01
