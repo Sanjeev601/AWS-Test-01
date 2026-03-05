@@ -71,23 +71,23 @@ Resources:
       Tags:
       - Key: Name
         Value: EC2Instance01
-      UserData:
-        Fn::Base64: !Sub |
-          <powershell>
-          Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
-          Import-Module ADDSDeployment
-          Install-ADDSForest `
-            -DomainName "titan.com" `
-            -SafeModeAdministratorPassword (ConvertTo-SecureString "P@ssw0rd!" -AsPlainText -Force) `
-            -CreateDNSDelegation:$false `
-            -DatabasePath "C:\Windows\NTDS" `
-            -LogPath "C:\Windows\NTDS" `
-            -SysvolPath "C:\Windows\SYSVOL" `
-            -InstallDNS:$true `
-            -Force:$true
-            -ForestMode "Win2016" `
-            -DomainMode "Win2016"
-          </powershell>  
+      # UserData:
+      #   Fn::Base64: !Sub |
+      #     <powershell>
+      #     Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+      #     Import-Module ADDSDeployment
+      #     Install-ADDSForest `
+      #       -DomainName "titan.com" `
+      #       -SafeModeAdministratorPassword (ConvertTo-SecureString "P@ssw0rd!" -AsPlainText -Force) `
+      #       -CreateDNSDelegation:$false `
+      #       -DatabasePath "C:\Windows\NTDS" `
+      #       -LogPath "C:\Windows\NTDS" `
+      #       -SysvolPath "C:\Windows\SYSVOL" `
+      #       -InstallDNS:$true `
+      #       -Force:$true
+      #       -ForestMode "Win2016" `
+      #       -DomainMode "Win2016"
+      #     </powershell>  
 
   SecurityGroup01:
     Type: AWS::EC2::SecurityGroup
