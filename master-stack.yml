@@ -1,16 +1,166 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Root stack to create EC2 Launch Template and EC2 Instance"
+Description: "Create 2 EC2 Web Servers and an Network Load Balancer"
 
 Resources:
-  LaunchTemplateStack:
-    Type: AWS::CloudFormation::Stack
+  VPC2:
+    Type: AWS::EC2::VPC
     Properties:
-      TemplateURL: https://srijitadutta.s3.us-east-1.amazonaws.com/LaunchTemplate01.yml
+      CidrBlock: 10.0.0.0/16
+      Tags:
+      - Key: Name
+        Value: ProdVPC
 
-  EC2InstanceStack:
-    Type: AWS::CloudFormation::Stack
+  Subnet1:
+    Type: AWS::EC2::Subnet
     Properties:
-      TemplateURL: https://srijitadutta.s3.us-east-1.amazonaws.com/ec2-server01.yml
-      Parameters:
-        LaunchTemplateId: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateId
-        LaunchTemplateVersion: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateLatestVersion
+      VpcId: !Ref VPC2
+      CidrBlock: 10.0.1.0/24
+      Tags:
+      - Key: Name
+        Value: Subnet1
+
+  Subnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC2
+      CidrBlock: 10.0.2.0/24
+      Tags:
+      - Key: Name
+        Value: Subnet2
+
+  InternetGateway01:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: Name
+        Value: InternetGateway01
+
+  AttachInternetGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC2
+      InternetGatewayId: !Ref InternetGateway01
+
+  RouteTable01:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC2
+      Tags:
+      - Key: Name
+        Value: RouteTable01
+
+  PublicRoute01:
+    Type: AWS::EC2::Route
+    DependsOn: AttachInternetGateway
+    Properties:
+      RouteTableId: !Ref RouteTable01
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway01
+
+  SubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet1
+      RouteTableId: !Ref RouteTable01
+
+  SubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet2
+      RouteTableId: !Ref RouteTable01
+
+  SecurityGroup01:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP and SSH
+      VpcId: !Ref VPC2
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+
+  CreateKeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: MyKeyPair
+
+  WebServer01:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-01b14b7ad41e17ba4 # Amazon Linux 2 AMI (HVM), SSD Volume Type - ami-0c55b159cbfafe1f0
+      InstanceType: t2.micro
+      SubnetId: !Ref Subnet1
+      SecurityGroupIds:
+      - !Ref SecurityGroup01
+      Tags:
+      - Key: Name
+        Value: WebServer01
+      KeyName: !Ref CreateKeyPair
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          echo "Hello World from WebServer01" > /var/www/html/index.html
+          yum install -y httpd
+          systemctl start httpd
+          systemctl enable httpd
+
+  WebServer02:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-01b14b7ad41e17ba4 # Amazon Linux 2 AMI (HVM), SSD Volume Type - ami-0c55b159cbfafe1f0
+      InstanceType: t2.micro
+      SubnetId: !Ref Subnet2
+      SecurityGroupIds:
+      - !Ref SecurityGroup01
+      Tags:
+      - Key: Name
+        Value: WebServer02
+      KeyName: !Ref CreateKeyPair
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          echo "Hello World from WebServer02" > /var/www/html/index.html
+          yum install -y httpd
+          systemctl start httpd
+          systemctl enable httpd
+
+  LoadBalancer01:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: network
+      Subnets:
+      - !Ref Subnet1
+      - !Ref Subnet2
+      Tags:
+      - Key: Name
+        Value: LoadBalancer01
+
+   NLBTargetGroup01:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      VpcId: !Ref VPC2
+      Port: 80
+      Protocol: TCP
+      TargetType: instance
+      Tags:
+      - Key: Name
+        Value: NLBTargetGroup01
+      Targets:
+      - Id: !Ref WebServer01
+      - Id: !Ref WebServer02
+
+   NLBListener01:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer01
+      Port: 80
+      Protocol: TCP
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref NLBTargetGroup01
+
+  Outputs:
+    LoadBalancerDNSName:
+      Description: "DNS Name of the Network Load Balancer"
+      Value: !GetAtt LoadBalancer01.DNSName     
