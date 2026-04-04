@@ -136,7 +136,7 @@ Resources:
       - Key: Name
         Value: LoadBalancer01
 
-   NLBTargetGroup01:
+  NLBTargetGroup01:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       VpcId: !Ref VPC2
@@ -150,7 +150,7 @@ Resources:
       - Id: !Ref WebServer01
       - Id: !Ref WebServer02
 
-   NLBListener01:
+  NLBListener01:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn: !Ref LoadBalancer01
@@ -160,7 +160,7 @@ Resources:
       - Type: forward
         TargetGroupArn: !Ref NLBTargetGroup01
 
-  Outputs:
-    LoadBalancerDNSName:
-      Description: "DNS Name of the Network Load Balancer"
-      Value: !GetAtt LoadBalancer01.DNSName     
+Outputs:
+  LoadBalancerDNSName:
+    Description: "DNS Name of the Network Load Balancer"
+    Value: !GetAtt LoadBalancer01.DNSName
