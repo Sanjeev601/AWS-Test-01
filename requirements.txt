@@ -1,0 +1,2 @@
+# Requirements for AWS Lambda test
+# Add dependencies here, e.g., boto3
