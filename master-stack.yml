@@ -1,166 +1,97 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Create 2 EC2 Web Servers and an Network Load Balancer"
+Description: "Windows EC2 instance with RDP access and local administrator user jasmine"
+
+Parameters:
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair to enable RDP/administrative access
+
+  JasminePassword:
+    NoEcho: true
+    Type: String
+    Description: Password for the local jasmine account
+    MinLength: 8
+    MaxLength: 32
+    AllowedPattern: "[A-Za-z0-9@!#$%^&*()_+=-]+"
+    ConstraintDescription: "Must be 8-32 characters and contain only alphanumeric or special characters."
 
 Resources:
-  VPC2:
+  MyVPC:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: 10.0.0.0/16
-      Tags:
-      - Key: Name
-        Value: ProdVPC
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
 
-  Subnet1:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC2
-      CidrBlock: 10.0.1.0/24
-      Tags:
-      - Key: Name
-        Value: Subnet1
-
-  Subnet2:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC2
-      CidrBlock: 10.0.2.0/24
-      Tags:
-      - Key: Name
-        Value: Subnet2
-
-  InternetGateway01:
+  InternetGateway:
     Type: AWS::EC2::InternetGateway
-    Properties:
-      Tags:
-      - Key: Name
-        Value: InternetGateway01
 
-  AttachInternetGateway:
+  VPCGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      VpcId: !Ref VPC2
-      InternetGatewayId: !Ref InternetGateway01
+      VpcId: !Ref MyVPC
+      InternetGatewayId: !Ref InternetGateway
 
-  RouteTable01:
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+
+  RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref VPC2
-      Tags:
-      - Key: Name
-        Value: RouteTable01
+      VpcId: !Ref MyVPC
 
-  PublicRoute01:
+  Route:
     Type: AWS::EC2::Route
-    DependsOn: AttachInternetGateway
+    DependsOn: VPCGatewayAttachment
     Properties:
-      RouteTableId: !Ref RouteTable01
+      RouteTableId: !Ref RouteTable
       DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref InternetGateway01
+      GatewayId: !Ref InternetGateway
 
-  SubnetRouteTableAssociation1:
+  SubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref Subnet1
-      RouteTableId: !Ref RouteTable01
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref RouteTable
 
-  SubnetRouteTableAssociation2:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref Subnet2
-      RouteTableId: !Ref RouteTable01
-
-  SecurityGroup01:
+  RDPSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow HTTP and SSH
-      VpcId: !Ref VPC2
+      GroupDescription: Allow RDP access
+      VpcId: !Ref MyVPC
       SecurityGroupIngress:
       - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
+        FromPort: 3389
+        ToPort: 3389
         CidrIp: 0.0.0.0/0
 
-  CreateKeyPair:
-    Type: AWS::EC2::KeyPair
-    Properties:
-      KeyName: MyKeyPair
-
-  WebServer01:
+  WindowsInstance:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-01b14b7ad41e17ba4 # Amazon Linux 2 AMI (HVM), SSD Volume Type - ami-0c55b159cbfafe1f0
-      InstanceType: t2.micro
-      SubnetId: !Ref Subnet1
+      InstanceType: t3.micro
+      KeyName: !Ref KeyName
+      SubnetId: !Ref PublicSubnet
       SecurityGroupIds:
-      - !Ref SecurityGroup01
-      Tags:
-      - Key: Name
-        Value: WebServer01
-      KeyName: !Ref CreateKeyPair
+      - !Ref RDPSecurityGroup
+      ImageId: ami-0b2f6494ff0b07a0e # Windows Server 2019 Base (update per region)
       UserData:
         Fn::Base64: !Sub |
-          #!/bin/bash
-          echo "Hello World from WebServer01" > /var/www/html/index.html
-          yum install -y httpd
-          systemctl start httpd
-          systemctl enable httpd
-
-  WebServer02:
-    Type: AWS::EC2::Instance
-    Properties:
-      ImageId: ami-01b14b7ad41e17ba4 # Amazon Linux 2 AMI (HVM), SSD Volume Type - ami-0c55b159cbfafe1f0
-      InstanceType: t2.micro
-      SubnetId: !Ref Subnet2
-      SecurityGroupIds:
-      - !Ref SecurityGroup01
-      Tags:
-      - Key: Name
-        Value: WebServer02
-      KeyName: !Ref CreateKeyPair
-      UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash
-          echo "Hello World from WebServer02" > /var/www/html/index.html
-          yum install -y httpd
-          systemctl start httpd
-          systemctl enable httpd
-
-  LoadBalancer01:
-    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
-    Properties:
-      Type: network
-      Subnets:
-      - !Ref Subnet1
-      - !Ref Subnet2
-      Tags:
-      - Key: Name
-        Value: LoadBalancer01
-
-  NLBTargetGroup01:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    Properties:
-      VpcId: !Ref VPC2
-      Port: 80
-      Protocol: TCP
-      TargetType: instance
-      Tags:
-      - Key: Name
-        Value: NLBTargetGroup01
-      Targets:
-      - Id: !Ref WebServer01
-      - Id: !Ref WebServer02
-
-  NLBListener01:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      LoadBalancerArn: !Ref LoadBalancer01
-      Port: 80
-      Protocol: TCP
-      DefaultActions:
-      - Type: forward
-        TargetGroupArn: !Ref NLBTargetGroup01
+          <powershell>
+          # Create local user 'jasmine' with password from parameter
+          $Password = ConvertTo-SecureString "${JasminePassword}" -AsPlainText -Force
+          New-LocalUser -Name "jasmine" -Password $Password -FullName "Jasmine User" -Description "Local RDP user"
+          # Add user to Remote Desktop Users group
+          Add-LocalGroupMember -Group "Remote Desktop Users" -Member "jasmine"
+          # Add user to Administrators group
+          Add-LocalGroupMember -Group "Administrators" -Member "jasmine"
+          </powershell>
 
 Outputs:
-  LoadBalancerDNSName:
-    Description: "DNS Name of the Network Load Balancer"
-    Value: !GetAtt LoadBalancer01.DNSName
+  InstancePublicDNS:
+    Description: Public DNS of the Windows EC2 instance
+    Value: !GetAtt WindowsInstance.PublicDnsName
