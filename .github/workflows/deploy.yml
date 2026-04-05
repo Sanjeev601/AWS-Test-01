@@ -30,3 +30,6 @@ jobs:
             --template-file master-stack.yml \
             --stack-name GitHubActionsCloudStack-${{ github.run_id }} \
             --capabilities CAPABILITY_NAMED_IAM
+            --parameter-overrides \
+              KeyName=${{ secrets.AWS_KEY_NAME }} \
+              JasminePassword=${{ secrets.JASMINE_PASSWORD }}
